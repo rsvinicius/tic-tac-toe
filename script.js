@@ -27,9 +27,9 @@ const Player = (name, symbol) => {
 };
 
 const GameController = (() => {
-    const player1 = Player("Player 1", "X");
-    const player2 = Player("Player 2", "O");
-    let currentPlayer = player1;
+    let player1 = null;
+    let player2 = null;
+    let currentPlayer = null;
     let isGameOver = false;
 
     const switchPlayer = () => {
@@ -62,31 +62,74 @@ const GameController = (() => {
 
     const playTurn = (index) => {
         if (isGameOver) {
-            console.log("Game is over. Reset to play again.");
+            DisplayController.showMessage("Game is over. Restart to play again.");
             return;
         }
 
         if (Gameboard.setCell(index, currentPlayer.symbol)) {
-            Gameboard.printBoard();
+            DisplayController.render();
             const winner = checkWinner();
             if (winner) {
-                console.log(winner === "Tie" ? "It's a tie!" : `${winner.name} wins!`);
+                DisplayController.showMessage(
+                    winner === "Tie" ? "It's a tie!" : `${winner.name} wins!`
+                );
             } else {
                 switchPlayer();
-                console.log(`${currentPlayer.name}'s turn (${currentPlayer.symbol}).`);
+                DisplayController.showMessage(`${currentPlayer.name}'s turn (${currentPlayer.symbol}).`);
             }
         } else {
-            console.log("Cell is already taken. Try another one.");
+            DisplayController.showMessage("Cell is already taken. Try another one.");
         }
     };
 
-    const resetGame = () => {
-        Gameboard.resetBoard();
+    const startGame = (name1, name2) => {
+        player1 = Player(name1, "X");
+        player2 = Player(name2, "O");
         currentPlayer = player1;
         isGameOver = false;
-        console.log("Game reset. Player 1 starts.");
-        Gameboard.printBoard();
+        Gameboard.resetBoard();
+        DisplayController.removePlayerInputs();
+        DisplayController.render();
+        DisplayController.showMessage(`${currentPlayer.name}'s turn (${currentPlayer.symbol}).`);
     };
 
-    return { playTurn, resetGame };
+    return { playTurn, startGame };
 })();
+
+const DisplayController = (() => {
+    const render = () => {
+        const board = Gameboard.getBoard();
+        const boardContainer = document.querySelector(".gameboard");
+        boardContainer.innerHTML = "";
+        board.forEach((cell, index) => {
+            const cellDiv = document.createElement("div");
+            cellDiv.classList.add("cell");
+            cellDiv.textContent = cell;
+            cellDiv.addEventListener("click", () => GameController.playTurn(index));
+            boardContainer.appendChild(cellDiv);
+        });
+    };
+
+    const showMessage = (message) => {
+        const messageContainer = document.querySelector(".message");
+        if (messageContainer) {
+            messageContainer.textContent = message;
+        }
+    };
+
+    const removePlayerInputs = () => {
+        const playerInputs = document.querySelector('.player-inputs');
+        if (playerInputs) {
+            playerInputs.style.display = 'none';
+          }
+    };
+
+    return { render, showMessage, removePlayerInputs };
+})();
+
+const startButton = document.querySelector(".start-button");
+startButton.addEventListener("click", () => {
+    const player1Name = document.querySelector("#player1").value || "Player 1";
+    const player2Name = document.querySelector("#player2").value || "Player 2";
+    GameController.startGame(player1Name, player2Name);
+});
