@@ -11,7 +11,15 @@ const Gameboard = (() => {
         return false;
     };
 
-    return { getBoard, resetBoard, setCell };
+    const printBoard = () => {
+        console.log(`\n${board.slice(0, 3).join(" | ")}`);
+        console.log(`---------`);
+        console.log(`${board.slice(3, 6).join(" | ")}`);
+        console.log(`---------`);
+        console.log(`${board.slice(6, 9).join(" | ")}`);
+    };
+
+    return { getBoard, resetBoard, setCell, printBoard };
 })();
 
 const Player = (name, symbol) => {
@@ -59,11 +67,13 @@ const GameController = (() => {
         }
 
         if (Gameboard.setCell(index, currentPlayer.symbol)) {
+            Gameboard.printBoard();
             const winner = checkWinner();
             if (winner) {
                 console.log(winner === "Tie" ? "It's a tie!" : `${winner.name} wins!`);
             } else {
                 switchPlayer();
+                console.log(`${currentPlayer.name}'s turn (${currentPlayer.symbol}).`);
             }
         } else {
             console.log("Cell is already taken. Try another one.");
@@ -75,14 +85,8 @@ const GameController = (() => {
         currentPlayer = player1;
         isGameOver = false;
         console.log("Game reset. Player 1 starts.");
+        Gameboard.printBoard();
     };
 
     return { playTurn, resetGame };
 })();
-
-// Example Gameplay in Console
-// GameController.playTurn(0); 
-// GameController.playTurn(1); 
-// GameController.playTurn(3); 
-// GameController.playTurn(4); 
-// GameController.playTurn(6); 
