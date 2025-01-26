@@ -4,7 +4,7 @@ The project is a browser-based implementation of the classic Tic Tac Toe game, e
 
 ## Live Demo
 
-A live demo of the project is available at: [Library App Demo](https://rsvinicius.github.io/tic-tac-toe)
+A live demo of the project is available at: [Tic Tac Toe App Demo](https://rsvinicius.github.io/tic-tac-toe)
 
 ## Features
 
